@@ -15,6 +15,14 @@ var GENERIC_LAST_SEGMENTS = {
   gtk: true
 }
 
+// App ids/classes that identify a terminal emulator, used to decide whether
+// the cwd/command enrichment is worth showing.
+var TERMINAL_IDS = [
+  "kitty", "foot", "alacritty", "ghostty", "wezterm", "konsole",
+  "gnome-terminal", "xfce4-terminal", "xterm", "st", "tmux", "termite",
+  "rio", "contour", "blackbox", "hyper"
+]
+
 function escapeRegExp(value) {
   return String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
 }
@@ -60,4 +68,33 @@ function activity(title, appName) {
   cleaned = cleaned.replace(BROWSER_SUFFIX, "").trim()
 
   return cleaned.length > 0 ? cleaned : raw
+}
+
+function isTerminal(appId) {
+  var value = String(appId || "").toLowerCase()
+  if (!value) return false
+  for (var i = 0; i < TERMINAL_IDS.length; i++) {
+    if (value.indexOf(TERMINAL_IDS[i]) !== -1) return true
+  }
+  return false
+}
+
+// "~" for the home directory, shortening long paths from the left.
+function shortenPath(path, home) {
+  var value = String(path || "").trim()
+  if (!value) return ""
+  var h = String(home || "").replace(/\/+$/, "")
+  if (h && (value === h || value.indexOf(h + "/") === 0))
+    value = "~" + value.slice(h.length)
+  var parts = value.split("/")
+  if (parts.length > 4) value = "…/" + parts.slice(parts.length - 3).join("/")
+  return value
+}
+
+// Activity line for a terminal with cwd/command enrichment.
+function terminalActivity(cwd, cmd, home, fallback) {
+  var dir = shortenPath(cwd, home)
+  var command = String(cmd || "").trim()
+  if (!dir && !command) return String(fallback || "")
+  return command ? dir + " · " + command : dir
 }
