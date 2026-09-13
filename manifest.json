@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "diego.window-switcher",
+  "name": "Window Switcher",
+  "version": "1.0.0",
+  "author": "Diego Olmedo",
+  "license": "MIT",
+  "description": "List every open window across all workspaces and jump to it, with a live preview of the selected window.",
+  "kinds": ["overlay"],
+  "keepLoaded": true,
+  "entryPoints": {
+    "overlay": "WindowSwitcher.qml"
+  }
+}
